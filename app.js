@@ -23,7 +23,7 @@ const Usuario = mongoose.model("Usuario", UsuarioSchema);
 // handlebars setup
 app.set("views", path.join(__dirname, "views"));
 
-app.set(
+app.engine(
   ".hbs",
   hbs.engine({
     layoutsDir: path.join(app.get("views"), "layouts"),
@@ -33,10 +33,21 @@ app.set(
   })
 );
 
-app.set("view engine", "hbs");
+app.set("view engine", ".hbs");
+
+/* app.engine(
+  ".hbs",
+  hbs({
+    layoutsDir: path.join(app.get("views"), "layouts"),
+    partialsDir: path.join(app.get("views"), "partials"),
+    extname: ".hbs",
+    defaultLayout: "main",
+  })
+);
+ */
 
 app.get("/", async (req, res) => {
-  let usuarios = await Usuario.find();
+  let usuarios = await Usuario.find().lean();
   res.render("index", { usuarios });
 });
 
@@ -47,7 +58,7 @@ app.get("/register", (req, res) => {
 app.post("/", async (req, res) => {
   const usuario = new Usuario(req.body);
   await usuario.save();
-  let usuarios = await Usuario.find();
+  let usuarios = await Usuario.find().lean();
   res.render("index", { usuarios });
 });
 
